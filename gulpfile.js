@@ -4,6 +4,7 @@ var sass        = require('gulp-sass');
 var prefix      = require('gulp-autoprefixer');
 var cp          = require('child_process');
 var runSequence = require('run-sequence');
+var htmlmin     = require('gulp-htmlmin');
 
 var messages = {
     jekyllBuild: '<span style="color: grey">Running:</span> $ jekyll build'
@@ -29,7 +30,7 @@ gulp.task('jekyll-rebuild', ['build'], function () {
  * Build everything.
  */
 gulp.task('build', function(callback) {
-      runSequence('jekyll-build', 'sass', callback);
+      runSequence('jekyll-build', ['sass', 'minify'], callback);
 });
 
 /**
@@ -55,6 +56,15 @@ gulp.task('sass', function () {
         .pipe(prefix(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
         .pipe(browserSync.reload({stream:true}))
         .pipe(gulp.dest('_site/css'));
+});
+
+/**
+ * Minify the generated html.
+ */
+gulp.task('minify', function() {
+    return gulp.src('_site/**/*.html')
+      .pipe(htmlmin({collapseWhitespace: true, minifyJS: true}))
+      .pipe(gulp.dest('_site'))
 });
 
 /**
